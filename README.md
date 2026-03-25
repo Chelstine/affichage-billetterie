@@ -1,169 +1,69 @@
-# Tableau de Bord - Ventes Tickets
+# Tableau de Bord Billetterie
 
-Un site web pour afficher les données de ventes de tickets depuis Airtable avec des barres de progression.
+Dashboard Node.js/Express pour afficher les donnees de billetterie Airtable, proteger l'acces par mot de passe, et declencher des actions de backup/restauration via webhook.
 
-## 📋 Configuration
+## Stack
 
-### Étape 1: Obtenir vos identifiants Airtable
+- Node.js 18+
+- Express
+- Frontend statique servi par `server.js`
+- Airtable appele uniquement depuis le serveur
+- Webhooks n8n optionnels pour backup, restauration et recuperation
 
-1. **Créer un Personal Access Token:**
-   - Allez sur [https://airtable.com/create/tokens](https://airtable.com/create/tokens)
-   - Cliquez sur "Create new token"
-   - Donnez un nom au token (ex: "Dashboard Tickets")
-   - Dans "Scopes", ajoutez:
-     - `data.records:read`
-   - Dans "Access", sélectionnez votre base de données
-   - Cliquez sur "Create token" et copiez le token
+## Configuration
 
-2. **Trouver votre Base ID:**
-   - Ouvrez votre base Airtable dans le navigateur
-   - L'URL ressemble à: `https://airtable.com/appXXXXXXXXXXXXXX/...`
-   - Le Base ID est la partie qui commence par `app` (ex: `appXXXXXXXXXXXXXX`)
+Copie `.env.example` vers `.env` en local ou `.env.production` sur le VPS.
 
-3. **Nom de la table:**
-   - C'est le nom exact de votre table dans Airtable
+Variables minimales:
 
-### Étape 2: Configurer le fichier config.js
+- `DASHBOARD_PASSWORD`
+- `AIRTABLE_API_KEY`
+- `AIRTABLE_BASE_ID`
+- `AIRTABLE_TABLE_NAME`
 
-Ouvrez le fichier `config.js` et remplacez les valeurs:
+Variables optionnelles:
 
-```javascript
-const AIRTABLE_CONFIG = {
-    API_KEY: 'patXXXXXXXXXXXXXX.XXXX...',  // Votre Personal Access Token
-    BASE_ID: 'appXXXXXXXXXXXXXX',           // Votre Base ID
-    TABLE_NAME: 'Nom de votre table'         // Le nom exact de la table
-};
-```
+- `AIRTABLE_VIEW_NAME`
+- `AIRTABLE_TECHNICAL_TABLE_NAME`
+- `AIRTABLE_TECHNICAL_PARAM_FIELD`
+- `AIRTABLE_TECHNICAL_VALUE_FIELD`
+- `AIRTABLE_TECHNICAL_LAST_SYNC_PARAM`
+- `N8N_RESTORE_WEBHOOK_URL`
+- `N8N_RESTORE_WEBHOOK_METHOD`
+- `N8N_RECOVERY_FEVER_WEBHOOK_URL`
+- `N8N_RECOVERY_FEVER_WEBHOOK_METHOD`
+- `N8N_BACKUP_WEBHOOK_URL`
+- `N8N_BACKUP_WEBHOOK_METHOD`
 
-### Étape 3: Configurer le Mot de Passe (Sécurité)
+Variables en plus pour le deploiement VPS:
 
-Le tableau de bord est protégé par une authentification. Vous devez définir la variable d'environnement `DASHBOARD_PASSWORD`.
+- `APP_DOMAIN`
+- `LETSENCRYPT_CA` 
 
-**Sur Railway / Hébergeur :**
-Ajoutez une nouvelle variable d'environnement nommée `DASHBOARD_PASSWORD` et définissez la valeur de votre choix (ex: `MonMotDePasseSecret`).
+## Lancement local
 
-**En local :**
-Vous pouvez lancer le serveur en définissant la variable :
 ```bash
-# Windows (PowerShell)
-$env:DASHBOARD_PASSWORD="mon_mot_de_passe"; npm start
-
-# Mac/Linux
-DASHBOARD_PASSWORD="mon_mot_de_passe" npm start
-```
-*Si aucune variable n'est définie, le mot de passe par défaut `admin` sera utilisé (non recommandé).*
-
-## 🚀 Utilisation
-
-### Option 1: Ouvrir directement (simple)
-Double-cliquez sur `index.html` pour ouvrir dans votre navigateur.
-
-**Note:** Certains navigateurs peuvent bloquer les requêtes API en local. Utilisez l'option 2 si cela ne fonctionne pas.
-
-### Option 2: Serveur local (recommandé)
-
-#### Avec Python:
-```bash
-# Python 3
-python -m http.server 8000
-
-# Puis ouvrez http://localhost:8000
+npm install
+npm start
 ```
 
-#### Avec Node.js:
-```bash
-npx serve .
+Puis ouvre `http://localhost:3000`.
 
-# Puis ouvrez l'URL affichée
-```
+Authentification:
 
-#### Avec VS Code:
-Installez l'extension "Live Server" et cliquez sur "Go Live" en bas à droite.
+- utilisateur: `admin`
+- mot de passe: valeur de `DASHBOARD_PASSWORD`
 
-## 📊 Colonnes affichées
+## Deploiement VPS
 
-Le tableau affiche les colonnes suivantes depuis Airtable:
+Le chemin recommande est `Docker Compose + Caddy`.
 
-### Informations principales
-- Date
-- Ville
-- Événement (Show)
+- Guide complet: `DEPLOY_VPS.md`
+- Configuration proxy HTTPS: `deploy/caddy/Caddyfile`
+- Script de redeploiement: `scripts/deploy-vps.sh`
 
-### Catégorie Or 🥇
-- Ventes - Fever - Or
-- Quota - Fever - Or
-- Ventes - Regiondo - Or
-- Quota - Regiondo - Or
-- Ventes - OT - Or
-- Quota - OT - Or
-- Total - Ventes - Or
-- Total - Quota - Or
-- Delta - Or
+## Notes de securite
 
-### Catégorie Platinium 💎
-- Ventes - Fever - Platinium
-- Quota - Fever - Platinium
-- Ventes - Regiondo - Platinium
-- Quota - Regiondo - Platinium
-- Ventes - OT - Platinium
-- Quota - OT - Platinium
-- Total - Ventes - Platinium
-- Total - Quota - Platinium
-- Delta - Platinium
-
-### Catégorie Argent 🥈
-- Ventes - Fever - Argent
-- Quota - Fever - Argent
-- Ventes - Regiondo - Argent
-- Quota - Regiondo - Argent
-- Ventes - OT - Argent
-- Quota - OT - Argent
-- Total - Ventes - Argent
-- Total - Quota - Argent
-- Delta - Argent
-
-### Totaux généraux 📈
-- Total - Ventes - Fever
-- Total - Ventes - Fever (%)
-- Total - Ventes - Regiondo
-- Total - Ventes - Regiondo (%)
-- Total - Ventes - OT
-- Total - Ventes - OT (%)
-- Total - Ventes
-- Total - Quota
-- Total - Delta
-- Statut
-
-## ✨ Fonctionnalités
-
-- ✅ Affichage des données en temps réel depuis Airtable
-- ✅ Barres de progression pour les ventes vs quotas
-- ✅ Filtrage dynamique par ville et **événement**
-- ✅ **Masquage intelligent** des catégories (Or, Platinium, Argent) si elles sont vides
-- ✅ Cartes récapitulatives avec totaux
-- ✅ Mise en forme colorée par catégorie (Or, Platinium, Argent)
-- ✅ Indicateurs visuels pour les deltas positifs/négatifs
-- ✅ Badges de statut (Atteint, En cours, Non atteint)
-✅ Interface sécurisée par **mot de passe** définie via variable d'environnement (`DASHBOARD_PASSWORD`)
-- ✅ Bouton d'actualisation manuelle
-- ✅ Design responsive
-
-## 🔧 Personnalisation
-
-### Modifier les colonnes
-Éditez la liste `COLUMNS_ORDER` dans `server.js` (via le proxy `/config.js`) pour ajouter, supprimer ou réordonner les colonnes.
-
-### Modifier les styles
-Éditez `styles.css` pour personnaliser les couleurs et le design.
-
-## ❓ Dépannage
-
-**"Erreur de chargement des données"**
-- Vérifiez que votre token API Airtable est valide
-- Vérifiez que le Base ID est correct
-- Vérifiez que le nom de la table est exact (sensible à la casse)
-- Vérifiez que votre token a accès à cette base
-
-**Problème CORS ou Local**
-- Utilisez le serveur Node.js inclus (`node server.js`) pour éviter les restrictions de sécurité du navigateur en local.
-- Accédez au tableau de bord via `http://localhost:3000`.
+- Les secrets Airtable restent cote serveur.
+- Le navigateur consomme uniquement les routes `/api/*`.
+- Un endpoint `GET /healthz` est disponible pour la supervision.
