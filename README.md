@@ -38,7 +38,10 @@ Variables optionnelles:
 Variables en plus pour le deploiement VPS:
 
 - `APP_DOMAIN`
-- `LETSENCRYPT_CA` 
+- `TRAEFIK_DOCKER_NETWORK`
+- `TRAEFIK_CERTRESOLVER`
+- `TRAEFIK_HTTP_ENTRYPOINT` (optionnelle)
+- `TRAEFIK_HTTPS_ENTRYPOINT` (optionnelle)
 
 ## Lancement local
 
@@ -56,11 +59,11 @@ Authentification:
 
 ## Deploiement VPS
 
-Le chemin recommande est `Docker Compose + Caddy`.
+Le chemin recommande est `Docker Compose + Traefik existant`.
 
 - Guide complet: `DEPLOY_VPS.md`
-- Configuration proxy HTTPS: `deploy/caddy/Caddyfile`
 - Script de redeploiement: `scripts/deploy-vps.sh`
+- Script d'envoi sans GitHub: `scripts/send-vps.ps1`
 
 ## Notes de securite
 
